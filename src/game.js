@@ -343,4 +343,8 @@ class Game {
     isGameOver() {
         return this.gameOver;
     }
+    
+    getScore() {
+        return this.score;
+    }
 }
