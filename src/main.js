@@ -129,11 +129,14 @@ class TankDestroyer {
             // Handle game over screen
             if (this.gameState === 'gameOver') {
                 console.log('Game over screen - key pressed:', e.code);
-                if (e.code === 'Space') {
-                    console.log('Space pressed, going to leaderboard');
+                if (e.code === 'KeyL') {
+                    console.log('L pressed, going to leaderboard');
                     this.gameState = 'leaderboard';
                 } else if (e.code === 'KeyR') {
                     console.log('R pressed, restarting game');
+                    this.restartGame();
+                } else if (e.code === 'Space') {
+                    console.log('Space pressed, restarting game');
                     this.restartGame();
                 }
             }
@@ -258,10 +261,10 @@ class TankDestroyer {
         // Instructions
         this.ctx.fillStyle = '#00FF00';
         this.ctx.font = '7px monospace';
-        this.ctx.fillText('PRESS SPACE FOR LEADERBOARD', this.gameWidth / 2, 155);
+        this.ctx.fillText('PRESS L FOR LEADERBOARD', this.gameWidth / 2, 155);
         this.ctx.fillStyle = '#AAAAAA';
         this.ctx.font = '6px monospace';
-        this.ctx.fillText('OR PRESS R TO PLAY AGAIN', this.gameWidth / 2, 165);
+        this.ctx.fillText('OR PRESS SPACE/R TO PLAY AGAIN', this.gameWidth / 2, 165);
     }
     
     // Handle player selection input
