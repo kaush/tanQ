@@ -183,6 +183,28 @@ class Game {
         // Check collisions
         this.checkCollisions();
         
+        // Update power-ups
+        this.powerUpManager.update(deltaTime);
+        
+        // Check power-up collisions
+        if (this.player && !this.player.destroyed) {
+            const collectedPowerUps = this.powerUpManager.checkCollisions(this.player);
+            collectedPowerUps.forEach(type => {
+                if (type === 'heart' && this.lives < this.maxLives) {
+                    this.lives++;
+                    console.log('Life gained! Lives:', this.lives);
+                    
+                    // Play power-up sound
+                    if (typeof window.audioSystem !== 'undefined') {
+                        window.audioSystem.playPowerUp();
+                    }
+                }
+            });
+        }
+        
+        // Bullets vs obstacles
+        this.checkBulletObstacleCollisions();
+        
         // Check wave completion
         if (this.enemies.length === 0 && this.enemiesRemaining <= 0) {
             this.score += 500; // Wave completion bonus
@@ -266,28 +288,6 @@ class Game {
                 this.player.y = this.height - 20;
             }
         });
-        
-        // Update power-ups
-        this.powerUpManager.update(deltaTime);
-        
-        // Check power-up collisions
-        if (this.player && !this.player.destroyed) {
-            const collectedPowerUps = this.powerUpManager.checkCollisions(this.player);
-            collectedPowerUps.forEach(type => {
-                if (type === 'heart' && this.lives < this.maxLives) {
-                    this.lives++;
-                    console.log('Life gained! Lives:', this.lives);
-                    
-                    // Play power-up sound
-                    if (typeof window.audioSystem !== 'undefined') {
-                        window.audioSystem.playPowerUp();
-                    }
-                }
-            });
-        }
-        
-        // Bullets vs obstacles
-        this.checkBulletObstacleCollisions();
     }
     
     checkBulletObstacleCollisions() {
