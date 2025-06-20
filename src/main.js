@@ -90,12 +90,27 @@ class TankDestroyer {
         this.ctx.font = '8px monospace';
         this.ctx.textAlign = 'center';
         
-        this.ctx.fillText('TANK DESTROYER', this.gameWidth / 2, 60);
+        // Company logo
+        this.ctx.fillStyle = '#FFFF00';
+        this.ctx.fillText('ARIN ARCADE PRESENTS', this.gameWidth / 2, 40);
+        
+        // Game title
+        this.ctx.fillStyle = '#00FF00';
+        this.ctx.font = '12px monospace';
+        this.ctx.fillText('tanQ', this.gameWidth / 2, 70);
+        
+        this.ctx.font = '8px monospace';
+        this.ctx.fillStyle = '#FF8800';
+        this.ctx.fillText('RETRO TANK DESTROYER', this.gameWidth / 2, 85);
+        
+        // Instructions
+        this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fillText('PRESS ANY KEY TO START', this.gameWidth / 2, 120);
         
         // Simple blinking effect
         if (Math.floor(Date.now() / 500) % 2) {
-            this.ctx.fillText('© 2025 RETRO GAMES', this.gameWidth / 2, 160);
+            this.ctx.fillStyle = '#888888';
+            this.ctx.fillText('© 2025 ARIN ARCADE', this.gameWidth / 2, 160);
         }
     }
     
