@@ -86,19 +86,18 @@ class Game {
         let smartTanks = Math.max(0, this.wave - 2); // Smart tanks from wave 3
         let fastTanks = Math.max(0, Math.floor((this.wave - 1) / 3)); // Fast tanks from wave 4
         
-        // Cap total enemies at 6 to fit spawn positions
+        // Cap total enemies at 8 to fit spawn positions (we have 8 spawn positions)
         const totalEnemies = basicTanks + smartTanks + fastTanks;
-        if (totalEnemies > 6) {
+        if (totalEnemies > 8) {
             // Reduce basic tanks if we have too many
-            basicTanks = Math.max(1, 6 - smartTanks - fastTanks);
+            basicTanks = Math.max(1, 8 - smartTanks - fastTanks);
         }
         
-        this.enemiesRemaining = basicTanks + smartTanks + fastTanks;
-        
         // Debug: Log wave info
-        console.log(`Starting Wave ${this.wave}: ${basicTanks} basic, ${smartTanks} smart, ${fastTanks} fast (Total: ${this.enemiesRemaining})`);
+        console.log(`Starting Wave ${this.wave}: ${basicTanks} basic, ${smartTanks} smart, ${fastTanks} fast (Total calculated: ${basicTanks + smartTanks + fastTanks})`);
+        console.log(`Wave ${this.wave} calculation: basicTanks=${basicTanks}, smartTanks=${smartTanks}, fastTanks=${fastTanks}, total=${totalEnemies}`);
         
-        // Spawn enemies with delay
+        // Spawn enemies with delay (enemiesRemaining will be set in spawnEnemies)
         this.spawnEnemies(basicTanks, smartTanks, fastTanks);
     }
     
@@ -133,8 +132,13 @@ class Game {
             this.enemies.push(new Enemy(pos.x, pos.y, 'fast'));
         }
         
+        // IMPORTANT: Update enemiesRemaining to match actual spawned enemies
+        this.enemiesRemaining = this.enemies.length;
+        
         // Debug: Log spawning info
         console.log(`Wave ${this.wave}: Spawned ${this.enemies.length} enemies (${basic} basic, ${smart} smart, ${fast} fast)`);
+        console.log(`Expected: ${basic + smart + fast}, Actually spawned: ${this.enemies.length}, enemiesRemaining: ${this.enemiesRemaining}`);
+    }
     }
     
     update(deltaTime, keys) {
@@ -206,7 +210,9 @@ class Game {
         this.checkBulletObstacleCollisions();
         
         // Check wave completion
+        console.log(`Wave ${this.wave}: enemies.length = ${this.enemies.length}, enemiesRemaining = ${this.enemiesRemaining}`);
         if (this.enemies.length === 0 && this.enemiesRemaining <= 0) {
+            console.log(`Wave ${this.wave} completed! Starting wave ${this.wave + 1}`);
             this.score += 500; // Wave completion bonus
             this.wave++;
             
@@ -262,6 +268,7 @@ class Game {
                         this.score += enemy.getScore();
                         this.enemies.splice(enemyIndex, 1);
                         this.enemiesRemaining--; // Decrement remaining enemies counter
+                        console.log(`Enemy destroyed! Remaining: ${this.enemiesRemaining}, Active enemies: ${this.enemies.length}`);
                         
                         // Play enemy destruction sound
                         if (typeof window.audioSystem !== 'undefined') {
