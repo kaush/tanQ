@@ -272,10 +272,41 @@ class AudioSystem {
         }
     }
     
-    // Resume audio context (required for some browsers)
-    resume() {
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+    toggleSound() {
+        if (this.masterVolume > 0) {
+            // Turn off sound
+            this.masterVolume = 0;
+            this.musicGain.gain.value = 0;
+            this.sfxGain.gain.value = 0;
+            
+            // Update button if it exists
+            const soundToggle = document.getElementById('soundToggle');
+            if (soundToggle) {
+                soundToggle.textContent = 'SOUND: OFF';
+                soundToggle.style.color = '#888888';
+            }
+            
+            return false; // Sound is now off
+        } else {
+            // Turn on sound
+            this.masterVolume = 0.3;
+            this.musicGain.gain.value = this.musicVolume * this.masterVolume;
+            this.sfxGain.gain.value = this.sfxVolume * this.masterVolume;
+            
+            // Update button if it exists
+            const soundToggle = document.getElementById('soundToggle');
+            if (soundToggle) {
+                soundToggle.textContent = 'SOUND: ON';
+                soundToggle.style.color = '#00FF00';
+            }
+            
+            // Initialize audio if needed
+            if (!this.isInitialized) {
+                this.init();
+            }
+            this.resume();
+            
+            return true; // Sound is now on
         }
     }
 }
@@ -288,27 +319,20 @@ window.addEventListener('load', () => {
     const soundToggle = document.getElementById('soundToggle');
     if (soundToggle) {
         soundToggle.addEventListener('click', () => {
-            if (audioSystem.masterVolume > 0) {
-                // Turn off sound
-                audioSystem.masterVolume = 0;
-                audioSystem.musicGain.gain.value = 0;
-                audioSystem.sfxGain.gain.value = 0;
-                soundToggle.textContent = 'SOUND: OFF';
-                soundToggle.style.color = '#888888';
-            } else {
-                // Turn on sound
-                audioSystem.masterVolume = 0.3;
-                audioSystem.musicGain.gain.value = audioSystem.musicVolume * audioSystem.masterVolume;
-                audioSystem.sfxGain.gain.value = audioSystem.sfxVolume * audioSystem.masterVolume;
-                soundToggle.textContent = 'SOUND: ON';
-                soundToggle.style.color = '#00FF00';
-                
-                // Initialize audio if needed
-                if (!audioSystem.isInitialized) {
-                    audioSystem.init();
-                }
-                audioSystem.resume();
-            }
+            audioSystem.toggleSound();
         });
     }
+    
+    // Add keyboard shortcut for sound toggle (M key)
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyM') {
+            audioSystem.toggleSound();
+        }
+    });
 });
+    // Resume audio context (required for some browsers)
+    resume() {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+    }

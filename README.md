@@ -29,6 +29,7 @@ A retro-style tank destroyer game inspired by classic Atari games.
 - **Movement**: WASD or Arrow Keys
 - **Fire**: SPACEBAR
 - **Rotate Turret**: Q (counter-clockwise) / E (clockwise)
+- **Toggle Sound**: M key or on-screen button
 - **Restart**: SPACE (on game over screen)
 
 ## Scoring
