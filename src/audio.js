@@ -21,6 +21,8 @@ class AudioSystem {
         
         try {
             console.log('Initializing audio system...');
+            this.updateStatus('Initializing audio system...');
+            
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
             // Create gain nodes for volume control
@@ -35,11 +37,21 @@ class AudioSystem {
             
             this.isInitialized = true;
             console.log('Audio system initialized successfully');
+            this.updateStatus('Audio initialized. Context state: ' + this.audioContext.state);
             
             // Play a test sound to verify audio is working
             this.playTestSound();
         } catch (error) {
             console.error('Audio initialization failed:', error);
+            this.updateStatus('Audio initialization failed: ' + error.message);
+        }
+    }
+    
+    // Update the audio status display
+    updateStatus(message) {
+        const statusElement = document.getElementById('audioStatus');
+        if (statusElement) {
+            statusElement.textContent = 'Audio Status: ' + message;
         }
     }
     
@@ -47,6 +59,8 @@ class AudioSystem {
     playTestSound() {
         try {
             console.log('Playing test sound...');
+            this.updateStatus('Playing test sound...');
+            
             const oscillator = this.audioContext.createOscillator();
             const gainNode = this.audioContext.createGain();
             
@@ -63,8 +77,40 @@ class AudioSystem {
             oscillator.start();
             oscillator.stop(this.audioContext.currentTime + 0.5);
             console.log('Test sound played');
+            
+            setTimeout(() => {
+                this.updateStatus('Test sound completed. Audio should be working.');
+            }, 500);
         } catch (error) {
             console.error('Test sound failed:', error);
+            this.updateStatus('Test sound failed: ' + error.message);
+        }
+    }
+    
+    // Resume audio context (required for modern browsers)
+    resume() {
+        if (!this.audioContext) {
+            console.log('No audio context to resume');
+            this.updateStatus('No audio context to resume');
+            return;
+        }
+        
+        if (this.audioContext.state === 'suspended') {
+            console.log('Resuming suspended audio context...');
+            this.updateStatus('Resuming suspended audio context...');
+            
+            this.audioContext.resume().then(() => {
+                console.log('Audio context resumed successfully');
+                this.updateStatus('Audio context resumed successfully');
+                // Play a test sound to verify audio is working
+                this.playTestSound();
+            }).catch(error => {
+                console.error('Failed to resume audio context:', error);
+                this.updateStatus('Failed to resume audio context: ' + error.message);
+            });
+        } else {
+            console.log('Audio context state:', this.audioContext.state);
+            this.updateStatus('Audio context state: ' + this.audioContext.state);
         }
     }
     
@@ -308,8 +354,8 @@ class AudioSystem {
         if (this.masterVolume > 0) {
             // Turn off sound
             this.masterVolume = 0;
-            this.musicGain.gain.value = 0;
-            this.sfxGain.gain.value = 0;
+            if (this.musicGain) this.musicGain.gain.value = 0;
+            if (this.sfxGain) this.sfxGain.gain.value = 0;
             
             // Update button if it exists
             const soundToggle = document.getElementById('soundToggle');
@@ -322,8 +368,8 @@ class AudioSystem {
         } else {
             // Turn on sound
             this.masterVolume = 0.3;
-            this.musicGain.gain.value = this.musicVolume * this.masterVolume;
-            this.sfxGain.gain.value = this.sfxVolume * this.masterVolume;
+            if (this.musicGain) this.musicGain.gain.value = this.musicVolume * this.masterVolume;
+            if (this.sfxGain) this.sfxGain.gain.value = this.sfxVolume * this.masterVolume;
             
             // Update button if it exists
             const soundToggle = document.getElementById('soundToggle');
@@ -375,23 +421,3 @@ window.addEventListener('load', () => {
         }
     });
 });
-    // Resume audio context (required for modern browsers)
-    resume() {
-        if (!this.audioContext) {
-            console.log('No audio context to resume');
-            return;
-        }
-        
-        if (this.audioContext.state === 'suspended') {
-            console.log('Resuming suspended audio context...');
-            this.audioContext.resume().then(() => {
-                console.log('Audio context resumed successfully');
-                // Play a test sound to verify audio is working
-                this.playTestSound();
-            }).catch(error => {
-                console.error('Failed to resume audio context:', error);
-            });
-        } else {
-            console.log('Audio context state:', this.audioContext.state);
-        }
-    }

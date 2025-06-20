@@ -139,9 +139,27 @@
                     INIT AUDIO
                 </button>
             </div>
+            <div id="audioStatus" style="margin-top: 10px; color: #FF8800; font-size: 12px;">
+                Audio Status: Initializing...
+            </div>
         </div>
     </div>
     
+    <script>
+        // Force audio initialization on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, attempting to initialize audio...');
+            // We need to wait a bit to make sure audio.js has loaded
+            setTimeout(function() {
+                if (window.audioSystem) {
+                    console.log('Initializing audio system from HTML...');
+                    window.audioSystem.init();
+                } else {
+                    console.log('Audio system not available yet');
+                }
+            }, 500);
+        });
+    </script>
     <script src="src/audio.js"></script>
     <script src="src/collision.js"></script>
     <script src="src/player.js"></script>
