@@ -7,6 +7,7 @@ class Game {
         // Game state
         this.score = 0;
         this.lives = 3;
+        this.maxLives = 5; // Maximum lives allowed
         this.wave = 1;
         this.gameOver = false;
         this.gameOverSoundPlayed = false;
@@ -17,6 +18,7 @@ class Game {
         this.playerBullets = [];
         this.enemyBullets = [];
         this.obstacles = [];
+        this.powerUpManager = new PowerUpManager(width, height);
         
         // Wave management
         this.enemiesRemaining = 0;
@@ -44,6 +46,9 @@ class Game {
         this.playerBullets = [];
         this.enemyBullets = [];
         this.obstacles = [];
+        
+        // Clear power-ups
+        this.powerUpManager.clear();
         
         // Create player
         this.player = new Player(this.width / 2, this.height - 20);
@@ -262,6 +267,25 @@ class Game {
             }
         });
         
+        // Update power-ups
+        this.powerUpManager.update(deltaTime);
+        
+        // Check power-up collisions
+        if (this.player && !this.player.destroyed) {
+            const collectedPowerUps = this.powerUpManager.checkCollisions(this.player);
+            collectedPowerUps.forEach(type => {
+                if (type === 'heart' && this.lives < this.maxLives) {
+                    this.lives++;
+                    console.log('Life gained! Lives:', this.lives);
+                    
+                    // Play power-up sound
+                    if (typeof window.audioSystem !== 'undefined') {
+                        window.audioSystem.playPowerUp();
+                    }
+                }
+            });
+        }
+        
         // Bullets vs obstacles
         this.checkBulletObstacleCollisions();
     }
@@ -308,6 +332,9 @@ class Game {
         this.enemyBullets.forEach(bullet => {
             bullet.draw(ctx);
         });
+        
+        // Draw power-ups
+        this.powerUpManager.draw(ctx);
         
         // Show wave start message
         if (this.waveStartDelay > 0) {

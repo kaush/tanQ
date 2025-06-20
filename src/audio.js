@@ -303,6 +303,23 @@ class AudioSystem {
         });
     }
     
+    // Play power-up collection sound
+    playPowerUp() {
+        if (!this.audioContext) return;
+        
+        // Ascending power-up sound
+        const notes = [330, 415, 523]; // E, G#, C
+        notes.forEach((freq, index) => {
+            setTimeout(() => {
+                const sound = this.createSquareWave(freq, 0.2, 0.1);
+                if (sound) {
+                    sound.oscillator.start();
+                    sound.oscillator.stop(this.audioContext.currentTime + 0.2);
+                }
+            }, index * 100);
+        });
+    }
+    
     // Background music loop (soft retro melody)
     startBackgroundMusic() {
         if (!this.audioContext || this.backgroundMusic) return;

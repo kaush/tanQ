@@ -33,6 +33,9 @@ class TankDestroyer {
         this.scoreResult = null;
         this.showLeaderboard = false;
         
+        // Pause functionality
+        this.isPaused = false;
+        
         console.log('TankDestroyer initialized, starting state:', this.gameState);
         
         // For testing - uncomment to skip player selection
@@ -121,6 +124,13 @@ class TankDestroyer {
                 return;
             }
             
+            // Handle pause during gameplay
+            if (this.gameState === 'playing' && e.code === 'KeyP') {
+                this.isPaused = !this.isPaused;
+                console.log('Game paused:', this.isPaused);
+                return;
+            }
+            
             // Start game on SPACE key from title screen
             if (this.gameState === 'title' && e.code === 'Space') {
                 this.handleGameStart();
@@ -184,11 +194,17 @@ class TankDestroyer {
                 this.drawTitleScreen();
                 break;
             case 'playing':
-                this.game.update(deltaTime, this.keys);
-                this.game.draw(this.ctx);
-                
-                if (this.game.isGameOver()) {
-                    this.handleGameOver();
+                if (!this.isPaused) {
+                    this.game.update(deltaTime, this.keys);
+                    this.game.draw(this.ctx);
+                    
+                    if (this.game.isGameOver()) {
+                        this.handleGameOver();
+                    }
+                } else {
+                    // Draw game in paused state
+                    this.game.draw(this.ctx);
+                    this.drawPauseOverlay();
                 }
                 break;
             case 'gameOver':
@@ -476,6 +492,23 @@ class TankDestroyer {
         this.ctx.font = '6px monospace';
         this.ctx.textAlign = 'center';
         this.ctx.fillText('SPACE: PLAY AGAIN', this.gameWidth / 2, this.gameHeight - 10);
+    }
+    
+    // Draw pause overlay
+    drawPauseOverlay() {
+        // Semi-transparent overlay
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
+        
+        // Pause text
+        this.ctx.fillStyle = '#FFFF00';
+        this.ctx.font = '12px monospace';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('PAUSED', this.gameWidth / 2, this.gameHeight / 2 - 10);
+        
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = '8px monospace';
+        this.ctx.fillText('PRESS P TO RESUME', this.gameWidth / 2, this.gameHeight / 2 + 10);
     }
 }
 
