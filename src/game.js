@@ -335,14 +335,9 @@ class Game {
         ctx.textAlign = 'right';
         ctx.fillText(`LIVES: ${this.lives}`, this.width - 5, 10);
         
-        // Wave and enemies remaining
+        // Wave
         ctx.textAlign = 'center';
         ctx.fillText(`WAVE: ${this.wave}`, this.width / 2, 10);
-        
-        // Debug info - enemies remaining (can remove later)
-        if (this.enemiesRemaining > 0) {
-            ctx.fillText(`ENEMIES: ${this.enemies.length}`, this.width / 2, 20);
-        }
     }
     
     isGameOver() {
