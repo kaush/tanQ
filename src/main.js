@@ -393,14 +393,20 @@ class TankDestroyer {
         const scores = window.highScoreManager.getHighScores();
         const startY = this.scoreResult ? 60 : 40;
         
-        this.ctx.textAlign = 'left';
+        // Header
+        this.ctx.textAlign = 'center';
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.font = '6px monospace';
-        this.ctx.fillText('RANK NAME      SCORE    DATE', 10, startY);
+        this.ctx.font = '7px monospace';
+        this.ctx.fillText('RANK    NAME         SCORE', this.gameWidth / 2, startY);
         
-        for (let i = 0; i < Math.min(scores.length, 8); i++) {
+        // Draw separator line
+        this.ctx.fillStyle = '#888888';
+        this.ctx.fillRect(20, startY + 3, this.gameWidth - 40, 1);
+        
+        // Display top 10 scores
+        for (let i = 0; i < Math.min(scores.length, 10); i++) {
             const score = scores[i];
-            const y = startY + 12 + i * 10;
+            const y = startY + 18 + i * 12;
             
             // Highlight current player's scores
             const isCurrentPlayer = score.name === window.highScoreManager.getCurrentPlayer();
@@ -410,19 +416,28 @@ class TankDestroyer {
                               Math.abs(score.timestamp - Date.now()) < 5000; // Recent score
             
             if (isNewScore) {
-                this.ctx.fillStyle = '#00FF00'; // Highlight new score
+                this.ctx.fillStyle = '#00FF00'; // Highlight new score in bright green
             } else if (isCurrentPlayer) {
-                this.ctx.fillStyle = '#FFFF00'; // Highlight player's other scores
+                this.ctx.fillStyle = '#FFFF00'; // Highlight player's other scores in yellow
             } else {
-                this.ctx.fillStyle = '#AAAAAA';
+                this.ctx.fillStyle = '#FFFFFF'; // Regular scores in white
             }
             
-            const rank = (i + 1).toString().padStart(2, ' ');
-            const name = score.name.substring(0, 8).padEnd(8, ' ');
-            const scoreStr = score.score.toString().padStart(6, ' ');
-            const date = score.date.substring(0, 8);
+            // Format the display
+            const rank = `${i + 1}.`.padEnd(3, ' ');
+            const name = score.name.substring(0, 10).padEnd(10, ' ');
+            const scoreStr = score.score.toString().padStart(8, ' ');
             
-            this.ctx.fillText(`${rank}   ${name} ${scoreStr}  ${date}`, 10, y);
+            this.ctx.textAlign = 'left';
+            this.ctx.fillText(`${rank}  ${name}  ${scoreStr}`, 25, y);
+        }
+        
+        // Show message if no scores yet
+        if (scores.length === 0) {
+            this.ctx.fillStyle = '#888888';
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText('NO SCORES YET', this.gameWidth / 2, startY + 30);
+            this.ctx.fillText('BE THE FIRST!', this.gameWidth / 2, startY + 45);
         }
         
         // Instructions
