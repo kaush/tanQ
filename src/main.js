@@ -25,24 +25,7 @@ class TankDestroyer {
         this.setupInput();
         
         // Add click handler for canvas
-        this.canvas.addEventListener('click', () => {
-            // Initialize audio on first user interaction
-            if (!audioSystem.isInitialized) {
-                audioSystem.init();
-            }
-            audioSystem.resume();
-            
-            // Start game on click from title screen
-            if (this.gameState === 'title') {
-                this.gameState = 'playing';
-                this.game.start();
-                audioSystem.playStartupMelody();
-                // Start background music after startup melody
-                setTimeout(() => {
-                    audioSystem.startBackgroundMusic();
-                }, 3000);
-            }
-        });
+        this.canvas.addEventListener('click', () => this.handleGameStart());
         
         // Start game loop
         this.lastTime = 0;
@@ -50,33 +33,60 @@ class TankDestroyer {
         requestAnimationFrame(this.gameLoop);
     }
     
+    // Safe method to handle audio system
+    initAudio() {
+        // Check if audioSystem exists
+        if (typeof window.audioSystem !== 'undefined') {
+            if (!window.audioSystem.isInitialized) {
+                window.audioSystem.init();
+            }
+            window.audioSystem.resume();
+            return true;
+        }
+        return false;
+    }
+    
+    // Handle game start (from click or key)
+    handleGameStart() {
+        if (this.gameState === 'title') {
+            this.gameState = 'playing';
+            this.game.start();
+            
+            // Try to play audio if available
+            if (this.initAudio()) {
+                window.audioSystem.playStartupMelody();
+                // Start background music after startup melody
+                setTimeout(() => {
+                    if (typeof window.audioSystem !== 'undefined') {
+                        window.audioSystem.startBackgroundMusic();
+                    }
+                }, 3000);
+            }
+        }
+    }
+    
     setupInput() {
         document.addEventListener('keydown', (e) => {
             this.keys[e.code] = true;
             
-            // Initialize audio on first user interaction
-            if (!audioSystem.isInitialized) {
-                audioSystem.init();
-            }
-            audioSystem.resume();
+            // Try to initialize audio
+            this.initAudio();
             
             // Start game on SPACE key from title screen
             if (this.gameState === 'title' && e.code === 'Space') {
-                this.gameState = 'playing';
-                this.game.start();
-                audioSystem.playStartupMelody();
-                // Start background music after startup melody
-                setTimeout(() => {
-                    audioSystem.startBackgroundMusic();
-                }, 3000);
+                this.handleGameStart();
             }
             
             // Restart game on space from game over screen
             if (this.gameState === 'gameOver' && e.code === 'Space') {
                 this.gameState = 'playing';
                 this.game.restart();
-                audioSystem.stopBackgroundMusic();
-                audioSystem.startBackgroundMusic();
+                
+                // Try to handle audio if available
+                if (typeof window.audioSystem !== 'undefined') {
+                    window.audioSystem.stopBackgroundMusic();
+                    window.audioSystem.startBackgroundMusic();
+                }
             }
         });
         

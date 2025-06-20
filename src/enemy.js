@@ -104,7 +104,9 @@ class Enemy {
         // Play movement sound if actually moved (throttled)
         if ((Math.abs(this.x - oldX) > 0.1 || Math.abs(this.y - oldY) > 0.1) && 
             (!this.lastMoveSound || Date.now() - this.lastMoveSound > 300)) {
-            audioSystem.playEnemyMove(this.type);
+            if (typeof window.audioSystem !== 'undefined') {
+                window.audioSystem.playEnemyMove(this.type);
+            }
             this.lastMoveSound = Date.now();
         }
     }
@@ -139,7 +141,9 @@ class Enemy {
         this.shootCooldown = this.shootInterval;
         
         // Play enemy shooting sound
-        audioSystem.playShoot(false);
+        if (typeof window.audioSystem !== 'undefined') {
+            window.audioSystem.playShoot(false);
+        }
         
         // Calculate bullet direction
         let bulletDx = 0;

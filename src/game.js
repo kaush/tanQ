@@ -184,7 +184,9 @@ class Game {
             this.wave++;
             
             // Play wave completion sound
-            audioSystem.playWaveComplete();
+            if (typeof window.audioSystem !== 'undefined') {
+                window.audioSystem.playWaveComplete();
+            }
             
             this.startWave();
         }
@@ -194,8 +196,10 @@ class Game {
             this.gameOver = true;
             
             // Play game over sound
-            audioSystem.playGameOver();
-            audioSystem.stopBackgroundMusic();
+            if (typeof window.audioSystem !== 'undefined') {
+                window.audioSystem.playGameOver();
+                window.audioSystem.stopBackgroundMusic();
+            }
             
             this.gameOverSoundPlayed = true;
         }
@@ -233,7 +237,9 @@ class Game {
                         this.enemiesRemaining--; // Decrement remaining enemies counter
                         
                         // Play enemy destruction sound
-                        audioSystem.playEnemyDestroyed(enemy.type);
+                        if (typeof window.audioSystem !== 'undefined') {
+                            window.audioSystem.playEnemyDestroyed(enemy.type);
+                        }
                     }
                 }
             });
@@ -246,7 +252,9 @@ class Game {
                 this.lives--;
                 
                 // Play player hit sound
-                audioSystem.playPlayerDestroyed();
+                if (typeof window.audioSystem !== 'undefined') {
+                    window.audioSystem.playPlayerDestroyed();
+                }
                 
                 // Reset player position
                 this.player.x = this.width / 2;

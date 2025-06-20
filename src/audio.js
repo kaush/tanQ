@@ -312,21 +312,21 @@ class AudioSystem {
 }
 
 // Global audio system instance
-const audioSystem = new AudioSystem();
+window.audioSystem = new AudioSystem();
 
 // Setup sound toggle button
 window.addEventListener('load', () => {
     const soundToggle = document.getElementById('soundToggle');
     if (soundToggle) {
         soundToggle.addEventListener('click', () => {
-            audioSystem.toggleSound();
+            window.audioSystem.toggleSound();
         });
     }
     
     // Add keyboard shortcut for sound toggle (M key)
     document.addEventListener('keydown', (e) => {
         if (e.code === 'KeyM') {
-            audioSystem.toggleSound();
+            window.audioSystem.toggleSound();
         }
     });
 });

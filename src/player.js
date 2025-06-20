@@ -52,7 +52,9 @@ class Player {
         
         // Play movement sound (throttled)
         if (isMoving && (!this.lastMoveSound || Date.now() - this.lastMoveSound > 200)) {
-            audioSystem.playPlayerMove();
+            if (typeof window.audioSystem !== 'undefined') {
+                window.audioSystem.playPlayerMove();
+            }
             this.lastMoveSound = Date.now();
         }
         
@@ -87,7 +89,9 @@ class Player {
         this.shootCooldown = 300; // 300ms cooldown
         
         // Play shooting sound
-        audioSystem.playShoot(true);
+        if (typeof window.audioSystem !== 'undefined') {
+            window.audioSystem.playShoot(true);
+        }
         
         // Calculate bullet starting position based on turret direction
         let bulletX = this.x + this.width / 2;
