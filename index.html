@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tank Destroyer - Retro Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+        }
+        
+        #gameContainer {
+            text-align: center;
+        }
+        
+        #gameCanvas {
+            border: 2px solid #333;
+            background-color: #000;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        #instructions {
+            color: #00FF00;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .controls {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="480" height="576"></canvas>
+        <div id="instructions">
+            <div class="controls">WASD or Arrow Keys: Move</div>
+            <div class="controls">SPACEBAR: Fire</div>
+            <div class="controls">Q/E: Rotate Turret</div>
+        </div>
+    </div>
+    
+    <script src="src/collision.js"></script>
+    <script src="src/player.js"></script>
+    <script src="src/enemy.js"></script>
+    <script src="src/game.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>
