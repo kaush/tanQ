@@ -33,6 +33,12 @@ class TankDestroyer {
         this.scoreResult = null;
         this.showLeaderboard = false;
         
+        console.log('TankDestroyer initialized, starting state:', this.gameState);
+        
+        // For testing - uncomment to skip player selection
+        // this.gameState = 'title';
+        // window.highScoreManager.setCurrentPlayer('TEST');
+        
         // Input handling
         this.keys = {};
         this.setupInput();
@@ -122,16 +128,21 @@ class TankDestroyer {
             
             // Handle game over screen
             if (this.gameState === 'gameOver') {
+                console.log('Game over screen - key pressed:', e.code);
                 if (e.code === 'Space') {
+                    console.log('Space pressed, going to leaderboard');
                     this.gameState = 'leaderboard';
                 } else if (e.code === 'KeyR') {
+                    console.log('R pressed, restarting game');
                     this.restartGame();
                 }
             }
             
             // Handle leaderboard screen
             if (this.gameState === 'leaderboard') {
+                console.log('Leaderboard screen - key pressed:', e.code);
                 if (e.code === 'Space' || e.code === 'Enter') {
+                    console.log('Going back to player select');
                     this.gameState = 'playerSelect';
                     this.existingNames = window.highScoreManager.getPlayerNames();
                 }
@@ -221,6 +232,8 @@ class TankDestroyer {
     }
     
     drawGameOverScreen() {
+        console.log('Drawing game over screen');
+        
         this.ctx.fillStyle = '#FF0000';
         this.ctx.font = '8px monospace';
         this.ctx.textAlign = 'center';
@@ -243,10 +256,12 @@ class TankDestroyer {
         }
         
         // Instructions
+        this.ctx.fillStyle = '#00FF00';
+        this.ctx.font = '7px monospace';
+        this.ctx.fillText('PRESS SPACE FOR LEADERBOARD', this.gameWidth / 2, 155);
         this.ctx.fillStyle = '#AAAAAA';
         this.ctx.font = '6px monospace';
-        this.ctx.fillText('SPACE: VIEW LEADERBOARD', this.gameWidth / 2, 155);
-        this.ctx.fillText('R: PLAY AGAIN', this.gameWidth / 2, 165);
+        this.ctx.fillText('OR PRESS R TO PLAY AGAIN', this.gameWidth / 2, 165);
     }
     
     // Handle player selection input
@@ -299,9 +314,20 @@ class TankDestroyer {
     
     // Handle game over
     handleGameOver() {
+        console.log('Game over detected, final score:', this.game.getScore());
         const finalScore = this.game.getScore();
-        this.scoreResult = window.highScoreManager.addScore(finalScore);
+        
+        // Make sure high score manager exists
+        if (window.highScoreManager) {
+            this.scoreResult = window.highScoreManager.addScore(finalScore);
+            console.log('Score result:', this.scoreResult);
+        } else {
+            console.error('High score manager not available');
+            this.scoreResult = null;
+        }
+        
         this.gameState = 'gameOver';
+        console.log('Game state changed to gameOver');
     }
     
     // Restart the game
@@ -370,6 +396,8 @@ class TankDestroyer {
     
     // Draw leaderboard
     drawLeaderboard() {
+        console.log('Drawing leaderboard');
+        
         this.ctx.fillStyle = '#FFFF00';
         this.ctx.font = '8px monospace';
         this.ctx.textAlign = 'center';
