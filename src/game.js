@@ -75,11 +75,21 @@ class Game {
         this.waveStartDelay = 1000; // 1 second delay
         
         // Determine enemy count and types based on wave
-        let basicTanks = Math.min(2 + this.wave, 6);
-        let smartTanks = Math.max(0, this.wave - 2);
-        let fastTanks = Math.max(0, Math.floor(this.wave / 3));
+        let basicTanks = Math.min(2 + Math.floor(this.wave / 2), 4); // 2-4 basic tanks
+        let smartTanks = Math.max(0, this.wave - 2); // Smart tanks from wave 3
+        let fastTanks = Math.max(0, Math.floor((this.wave - 1) / 3)); // Fast tanks from wave 4
+        
+        // Cap total enemies at 6 to fit spawn positions
+        const totalEnemies = basicTanks + smartTanks + fastTanks;
+        if (totalEnemies > 6) {
+            // Reduce basic tanks if we have too many
+            basicTanks = Math.max(1, 6 - smartTanks - fastTanks);
+        }
         
         this.enemiesRemaining = basicTanks + smartTanks + fastTanks;
+        
+        // Debug: Log wave info
+        console.log(`Starting Wave ${this.wave}: ${basicTanks} basic, ${smartTanks} smart, ${fastTanks} fast (Total: ${this.enemiesRemaining})`);
         
         // Spawn enemies with delay
         this.spawnEnemies(basicTanks, smartTanks, fastTanks);
@@ -87,11 +97,16 @@ class Game {
     
     spawnEnemies(basic, smart, fast) {
         const spawnPositions = [
-            {x: 20, y: 20}, {x: 80, y: 20}, {x: 140, y: 20},
-            {x: 20, y: 40}, {x: 140, y: 40}
+            {x: 20, y: 20}, {x: 60, y: 20}, {x: 100, y: 20}, {x: 140, y: 20},
+            {x: 20, y: 40}, {x: 140, y: 40},
+            {x: 40, y: 60}, {x: 120, y: 60}
         ];
         
         let spawnIndex = 0;
+        const totalEnemies = basic + smart + fast;
+        
+        // Clear existing enemies
+        this.enemies = [];
         
         // Spawn basic tanks
         for (let i = 0; i < basic && spawnIndex < spawnPositions.length; i++) {
@@ -110,6 +125,9 @@ class Game {
             const pos = spawnPositions[spawnIndex++];
             this.enemies.push(new Enemy(pos.x, pos.y, 'fast'));
         }
+        
+        // Debug: Log spawning info
+        console.log(`Wave ${this.wave}: Spawned ${this.enemies.length} enemies (${basic} basic, ${smart} smart, ${fast} fast)`);
     }
     
     update(deltaTime, keys) {
@@ -159,7 +177,7 @@ class Game {
         this.checkCollisions();
         
         // Check wave completion
-        if (this.enemies.length === 0 && this.enemiesRemaining === 0) {
+        if (this.enemies.length === 0 && this.enemiesRemaining <= 0) {
             this.score += 500; // Wave completion bonus
             this.wave++;
             this.startWave();
@@ -200,6 +218,7 @@ class Game {
                     if (enemy.destroyed) {
                         this.score += enemy.getScore();
                         this.enemies.splice(enemyIndex, 1);
+                        this.enemiesRemaining--; // Decrement remaining enemies counter
                     }
                 }
             });
@@ -263,6 +282,16 @@ class Game {
             bullet.draw(ctx);
         });
         
+        // Show wave start message
+        if (this.waveStartDelay > 0) {
+            ctx.fillStyle = '#FFFF00';
+            ctx.font = '12px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(`WAVE ${this.wave}`, this.width / 2, this.height / 2);
+            ctx.font = '8px monospace';
+            ctx.fillText('GET READY!', this.width / 2, this.height / 2 + 20);
+        }
+        
         // Draw HUD
         this.drawHUD(ctx);
     }
@@ -279,9 +308,14 @@ class Game {
         ctx.textAlign = 'right';
         ctx.fillText(`LIVES: ${this.lives}`, this.width - 5, 10);
         
-        // Wave
+        // Wave and enemies remaining
         ctx.textAlign = 'center';
         ctx.fillText(`WAVE: ${this.wave}`, this.width / 2, 10);
+        
+        // Debug info - enemies remaining (can remove later)
+        if (this.enemiesRemaining > 0) {
+            ctx.fillText(`ENEMIES: ${this.enemies.length}`, this.width / 2, 20);
+        }
     }
     
     isGameOver() {
