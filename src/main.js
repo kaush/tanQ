@@ -24,6 +24,26 @@ class TankDestroyer {
         this.keys = {};
         this.setupInput();
         
+        // Add click handler for canvas
+        this.canvas.addEventListener('click', () => {
+            // Initialize audio on first user interaction
+            if (!audioSystem.isInitialized) {
+                audioSystem.init();
+            }
+            audioSystem.resume();
+            
+            // Start game on click from title screen
+            if (this.gameState === 'title') {
+                this.gameState = 'playing';
+                this.game.start();
+                audioSystem.playStartupMelody();
+                // Start background music after startup melody
+                setTimeout(() => {
+                    audioSystem.startBackgroundMusic();
+                }, 3000);
+            }
+        });
+        
         // Start game loop
         this.lastTime = 0;
         this.gameLoop = this.gameLoop.bind(this);
@@ -40,8 +60,8 @@ class TankDestroyer {
             }
             audioSystem.resume();
             
-            // Start game on any key from title screen
-            if (this.gameState === 'title') {
+            // Start game on SPACE key from title screen
+            if (this.gameState === 'title' && e.code === 'Space') {
                 this.gameState = 'playing';
                 this.game.start();
                 audioSystem.playStartupMelody();
@@ -118,7 +138,9 @@ class TankDestroyer {
         
         // Instructions
         this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.fillText('PRESS ANY KEY TO START', this.gameWidth / 2, 120);
+        this.ctx.fillText('PRESS SPACE TO START', this.gameWidth / 2, 120);
+        this.ctx.fillStyle = '#AAAAAA';
+        this.ctx.fillText('OR CLICK ANYWHERE', this.gameWidth / 2, 135);
         
         // Simple blinking effect
         if (Math.floor(Date.now() / 500) % 2) {
