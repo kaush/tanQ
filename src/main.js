@@ -37,10 +37,34 @@ class TankDestroyer {
     initAudio() {
         // Check if audioSystem exists
         if (typeof window.audioSystem !== 'undefined') {
+            console.log('Initializing audio from game...');
             if (!window.audioSystem.isInitialized) {
                 window.audioSystem.init();
             }
             window.audioSystem.resume();
+            
+            // Force a user interaction with audio context
+            const unlockAudio = () => {
+                console.log('Unlocking audio...');
+                // Create and play a silent buffer to unlock audio
+                if (window.audioSystem.audioContext) {
+                    const buffer = window.audioSystem.audioContext.createBuffer(1, 1, 22050);
+                    const source = window.audioSystem.audioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(window.audioSystem.audioContext.destination);
+                    source.start(0);
+                    console.log('Audio unlocked');
+                }
+                
+                // Remove the event listeners
+                document.removeEventListener('click', unlockAudio);
+                document.removeEventListener('keydown', unlockAudio);
+            };
+            
+            // Add event listeners to unlock audio
+            document.addEventListener('click', unlockAudio);
+            document.addEventListener('keydown', unlockAudio);
+            
             return true;
         }
         return false;

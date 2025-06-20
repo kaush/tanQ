@@ -11,12 +11,16 @@ class AudioSystem {
         this.masterVolume = 0.3;
         this.musicVolume = 0.2;
         this.sfxVolume = 0.4;
+        
+        // Debug flag
+        this.debug = true;
     }
     
     async init() {
         if (this.isInitialized) return;
         
         try {
+            console.log('Initializing audio system...');
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             
             // Create gain nodes for volume control
@@ -30,9 +34,37 @@ class AudioSystem {
             this.sfxGain.gain.value = this.sfxVolume * this.masterVolume;
             
             this.isInitialized = true;
-            console.log('Audio system initialized');
+            console.log('Audio system initialized successfully');
+            
+            // Play a test sound to verify audio is working
+            this.playTestSound();
         } catch (error) {
-            console.warn('Audio initialization failed:', error);
+            console.error('Audio initialization failed:', error);
+        }
+    }
+    
+    // Test sound to verify audio is working
+    playTestSound() {
+        try {
+            console.log('Playing test sound...');
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
+            
+            gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, this.audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.5);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.start();
+            oscillator.stop(this.audioContext.currentTime + 0.5);
+            console.log('Test sound played');
+        } catch (error) {
+            console.error('Test sound failed:', error);
         }
     }
     
@@ -323,6 +355,19 @@ window.addEventListener('load', () => {
         });
     }
     
+    // Add init audio button handler
+    const initAudioButton = document.getElementById('initAudio');
+    if (initAudioButton) {
+        initAudioButton.addEventListener('click', () => {
+            console.log('Manual audio initialization requested');
+            if (!window.audioSystem.isInitialized) {
+                window.audioSystem.init();
+            }
+            window.audioSystem.resume();
+            window.audioSystem.playTestSound();
+        });
+    }
+    
     // Add keyboard shortcut for sound toggle (M key)
     document.addEventListener('keydown', (e) => {
         if (e.code === 'KeyM') {
@@ -330,9 +375,23 @@ window.addEventListener('load', () => {
         }
     });
 });
-    // Resume audio context (required for some browsers)
+    // Resume audio context (required for modern browsers)
     resume() {
-        if (this.audioContext && this.audioContext.state === 'suspended') {
-            this.audioContext.resume();
+        if (!this.audioContext) {
+            console.log('No audio context to resume');
+            return;
+        }
+        
+        if (this.audioContext.state === 'suspended') {
+            console.log('Resuming suspended audio context...');
+            this.audioContext.resume().then(() => {
+                console.log('Audio context resumed successfully');
+                // Play a test sound to verify audio is working
+                this.playTestSound();
+            }).catch(error => {
+                console.error('Failed to resume audio context:', error);
+            });
+        } else {
+            console.log('Audio context state:', this.audioContext.state);
         }
     }
