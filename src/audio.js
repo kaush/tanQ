@@ -47,12 +47,9 @@ class AudioSystem {
         }
     }
     
-    // Update the audio status display
+    // Update the audio status (console only)
     updateStatus(message) {
-        const statusElement = document.getElementById('audioStatus');
-        if (statusElement) {
-            statusElement.textContent = 'Audio Status: ' + message;
-        }
+        console.log('Audio Status: ' + message);
     }
     
     // Test sound to verify audio is working
