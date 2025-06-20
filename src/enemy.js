@@ -83,6 +83,8 @@ class Enemy {
         
         // Move based on current direction
         const moveSpeed = this.speed * (deltaTime / 1000);
+        const oldX = this.x;
+        const oldY = this.y;
         
         switch (this.direction) {
             case 0: // Up
@@ -97,6 +99,13 @@ class Enemy {
             case 3: // Left
                 this.x -= moveSpeed;
                 break;
+        }
+        
+        // Play movement sound if actually moved (throttled)
+        if ((Math.abs(this.x - oldX) > 0.1 || Math.abs(this.y - oldY) > 0.1) && 
+            (!this.lastMoveSound || Date.now() - this.lastMoveSound > 300)) {
+            audioSystem.playEnemyMove(this.type);
+            this.lastMoveSound = Date.now();
         }
     }
     
@@ -128,6 +137,9 @@ class Enemy {
         
         this.canShoot = false;
         this.shootCooldown = this.shootInterval;
+        
+        // Play enemy shooting sound
+        audioSystem.playShoot(false);
         
         // Calculate bullet direction
         let bulletDx = 0;

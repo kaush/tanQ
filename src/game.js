@@ -9,6 +9,7 @@ class Game {
         this.lives = 3;
         this.wave = 1;
         this.gameOver = false;
+        this.gameOverSoundPlayed = false;
         
         // Game objects
         this.player = null;
@@ -36,6 +37,7 @@ class Game {
         this.lives = 3;
         this.wave = 1;
         this.gameOver = false;
+        this.gameOverSoundPlayed = false;
         
         // Clear arrays
         this.enemies = [];
@@ -180,12 +182,22 @@ class Game {
         if (this.enemies.length === 0 && this.enemiesRemaining <= 0) {
             this.score += 500; // Wave completion bonus
             this.wave++;
+            
+            // Play wave completion sound
+            audioSystem.playWaveComplete();
+            
             this.startWave();
         }
         
         // Check game over
-        if (this.lives <= 0) {
+        if (this.lives <= 0 && !this.gameOverSoundPlayed) {
             this.gameOver = true;
+            
+            // Play game over sound
+            audioSystem.playGameOver();
+            audioSystem.stopBackgroundMusic();
+            
+            this.gameOverSoundPlayed = true;
         }
     }
     
@@ -219,6 +231,9 @@ class Game {
                         this.score += enemy.getScore();
                         this.enemies.splice(enemyIndex, 1);
                         this.enemiesRemaining--; // Decrement remaining enemies counter
+                        
+                        // Play enemy destruction sound
+                        audioSystem.playEnemyDestroyed(enemy.type);
                     }
                 }
             });
@@ -229,6 +244,10 @@ class Game {
             if (this.player && Collision.rectangles(bullet, this.player)) {
                 this.enemyBullets.splice(bulletIndex, 1);
                 this.lives--;
+                
+                // Play player hit sound
+                audioSystem.playPlayerDestroyed();
+                
                 // Reset player position
                 this.player.x = this.width / 2;
                 this.player.y = this.height - 20;

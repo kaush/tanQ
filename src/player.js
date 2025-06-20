@@ -27,22 +27,33 @@ class Player {
         // Movement
         let dx = 0;
         let dy = 0;
+        let isMoving = false;
         
         if (keys['KeyW'] || keys['ArrowUp']) {
             dy = -1;
             this.direction = 0;
+            isMoving = true;
         }
         if (keys['KeyS'] || keys['ArrowDown']) {
             dy = 1;
             this.direction = 2;
+            isMoving = true;
         }
         if (keys['KeyA'] || keys['ArrowLeft']) {
             dx = -1;
             this.direction = 3;
+            isMoving = true;
         }
         if (keys['KeyD'] || keys['ArrowRight']) {
             dx = 1;
             this.direction = 1;
+            isMoving = true;
+        }
+        
+        // Play movement sound (throttled)
+        if (isMoving && (!this.lastMoveSound || Date.now() - this.lastMoveSound > 200)) {
+            audioSystem.playPlayerMove();
+            this.lastMoveSound = Date.now();
         }
         
         // Diagonal movement
@@ -74,6 +85,9 @@ class Player {
         
         this.canShoot = false;
         this.shootCooldown = 300; // 300ms cooldown
+        
+        // Play shooting sound
+        audioSystem.playShoot(true);
         
         // Calculate bullet starting position based on turret direction
         let bulletX = this.x + this.width / 2;

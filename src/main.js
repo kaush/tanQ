@@ -34,16 +34,29 @@ class TankDestroyer {
         document.addEventListener('keydown', (e) => {
             this.keys[e.code] = true;
             
+            // Initialize audio on first user interaction
+            if (!audioSystem.isInitialized) {
+                audioSystem.init();
+            }
+            audioSystem.resume();
+            
             // Start game on any key from title screen
             if (this.gameState === 'title') {
                 this.gameState = 'playing';
                 this.game.start();
+                audioSystem.playStartupMelody();
+                // Start background music after startup melody
+                setTimeout(() => {
+                    audioSystem.startBackgroundMusic();
+                }, 3000);
             }
             
             // Restart game on space from game over screen
             if (this.gameState === 'gameOver' && e.code === 'Space') {
                 this.gameState = 'playing';
                 this.game.restart();
+                audioSystem.stopBackgroundMusic();
+                audioSystem.startBackgroundMusic();
             }
         });
         
