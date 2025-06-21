@@ -139,7 +139,6 @@ class Game {
         console.log(`Wave ${this.wave}: Spawned ${this.enemies.length} enemies (${basic} basic, ${smart} smart, ${fast} fast)`);
         console.log(`Expected: ${basic + smart + fast}, Actually spawned: ${this.enemies.length}, enemiesRemaining: ${this.enemiesRemaining}`);
     }
-    }
     
     update(deltaTime, keys) {
         if (this.gameOver) return;
