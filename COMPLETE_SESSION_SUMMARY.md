@@ -11,7 +11,7 @@ This document captures the complete development session for the TanQ retro tank 
 
 ---
 
-## 1. Initial Game Creation Request
+## 1. Initial test of Q
 
 ### User Prompt:
 > "what is the distance of moon from earth"
